@@ -1,10 +1,13 @@
 @echo off
+
+chcp 65001 >nul
+
 set "version=0.1a"
 set "elysium=[38;2;127;255;212mE[38;2;112;240;225ml[38;2;96;225;235my[38;2;80;210;240ms[38;2;64;195;245mi[38;2;48;180;250mu[38;2;32;165;255mm[0m"
 set "DS=[38;2;181;123;255mD[38;2;190;140;244mi[38;2;199;157;234ms[38;2;208;174;224mc[38;2;216;191;214mo[38;2;221;208;222mr[38;2;221;225;230md[0m"
 :: External commands
-if "%~1"=="status_zapret" (
-    call :test_service zapret soft
+if "%~1"=="status_DPI" (
+    call :test_service DPI soft
     call :tcp_enable
     exit /b
 )
@@ -114,12 +117,12 @@ exit /b
 cls
 chcp 437 > nul
 
-sc query "zapret" >nul 2>&1
+sc query "DPI" >nul 2>&1
 if !errorlevel!==0 (
-    for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Services\zapret" /v zapret-discord-youtube 2^>nul') do echo Service strategy installed from "%%B"
+    for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Services\DPI" /v DPI-discord-youtube 2^>nul') do echo Service strategy installed from "%%B"
 )
 
-call :test_service zapret
+call :test_service DPI
 call :test_service WinDivert
 echo:
 
@@ -130,7 +133,7 @@ if !errorlevel!==0 (
     call :PrintRed "Bypass (winws.exe) NOT FOUND"
 )
 
-pause
+timeout /t 1 >nul
 goto menu
 
 :test_service
@@ -162,7 +165,7 @@ exit /b
 cls
 chcp 65001 > nul
 
-set SRVCNAME=zapret
+set SRVCNAME=DPI
 sc query "!SRVCNAME!" >nul 2>&1
 if !errorlevel!==0 (
     net stop %SRVCNAME%
@@ -188,7 +191,7 @@ if !errorlevel!==0 (
 net stop "WinDivert14" >nul 2>&1
 sc delete "WinDivert14" >nul 2>&1
 
-pause
+timeout /t 0 >nul
 goto menu
 
 
@@ -222,7 +225,7 @@ if "!choice!"=="" goto :eof
 set "selectedFile=!file%choice%!"
 if not defined selectedFile (
     echo Invalid choice, exiting...
-    pause
+    timeout /t 2 >nul
     goto menu
 )
 
@@ -312,19 +315,18 @@ call :tcp_enable
 set ARGS=%args%
 call set "ARGS=%%ARGS:EXCL_MARK=^!%%"
 echo Final args: !ARGS!
-set SRVCNAME=zapret
+set SRVCNAME=DPI
 
 net stop %SRVCNAME% >nul 2>&1
 sc delete %SRVCNAME% >nul 2>&1
-sc create %SRVCNAME% binPath= "\"%BIN_PATH%winws.exe\" !ARGS!" DisplayName= "zapret" start= auto
-sc description %SRVCNAME% "Zapret DPI bypass software"
+sc create %SRVCNAME% binPath= "\"%BIN_PATH%winws.exe\" !ARGS!" DisplayName= "DPI" start= auto
+sc description %SRVCNAME% "DPI DPI bypass software"
 sc start %SRVCNAME%
 for %%F in ("!file%choice%!") do (
     set "filename=%%~nF"
 )
-reg add "HKLM\System\CurrentControlSet\Services\zapret" /v zapret-discord-youtube /t REG_SZ /d "!filename!" /f
-
-pause
+reg add "HKLM\System\CurrentControlSet\Services\DPI" /v DPI-discord-youtube /t REG_SZ /d "!filename!" /f
+timeout /t 0 >nul
 goto menu
 
 
@@ -334,8 +336,8 @@ chcp 437 > nul
 cls
 
 :: Set current version and URLs
-set "GITHUB_VERSION_URL=https://raw.githubusercontent.com/Flowseal/zapret-discord-youtube/main/.service/version.txt"
-set "GITHUB_DOWNLOAD_URL=https://github.com/Flowseal/zapret-discord-youtube/releases/latest/download/zapret-discord-youtube-"
+set "GITHUB_VERSION_URL=https://raw.githubusercontent.com/Muiqy/Elysium-fix/refs/heads/main/version.txt"
+set "GITHUB_DOWNLOAD_URL=https://github.com/Muiqy/Elysium-fix/archive/refs/heads/main.zip"
 
 :: Get the latest version from GitHub
 for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri \"%GITHUB_VERSION_URL%\" -Headers @{\"Cache-Control\"=\"no-cache\"} -TimeoutSec 5).Content.Trim()" 2^>nul') do set "GITHUB_VERSION=%%A"
@@ -344,16 +346,17 @@ for /f "delims=" %%A in ('powershell -command "(Invoke-WebRequest -Uri \"%GITHUB
 if not defined GITHUB_VERSION (
     echo Warning: failed to fetch the latest version. This warning does not affect the operation of fix
     timeout /T 9
-    if "%1"=="soft" exit 
+    timeout /t 6 >nul 
     goto menu
 )
 
 :: Version comparison
-if "%LOCAL_VERSION%"=="%GITHUB_VERSION%" (
-    echo Latest version installed: %LOCAL_VERSION%
-    
-    if "%1"=="soft" exit 
-    pause
+chcp 65001 >nul
+if "%version%"=="%GITHUB_VERSION%" (
+    echo Latest version installed: %version%
+	call :PrintGreen "painting cat just enjoy..."
+	echo           🐈
+	timeout /t 4 >nul
     goto menu
 ) 
 
@@ -370,9 +373,7 @@ if /i "%CHOICE%"=="Y" (
     start "" "%GITHUB_DOWNLOAD_URL%%GITHUB_VERSION%.rar"
 )
 
-
-if "%1"=="soft" exit 
-pause
+timeout /t 2 >nul
 goto menu
 
 
@@ -387,7 +388,7 @@ sc query BFE | findstr /I "RUNNING" > nul
 if !errorlevel!==0 (
     call :PrintGreen "Base Filtering Engine check passed"
 ) else (
-    call :PrintRed "[X] Base Filtering Engine is not running. This service is required for zapret to work"
+    call :PrintRed "[X] Base Filtering Engine is not running. This service is required for DPI to work"
 )
 echo:
 
@@ -430,7 +431,7 @@ echo:
 tasklist /FI "IMAGENAME eq AdguardSvc.exe" | find /I "AdguardSvc.exe" > nul
 if !errorlevel!==0 (
     call :PrintRed "[X] Adguard process found. Adguard may cause problems with Discord"
-    call :PrintRed "https://github.com/Flowseal/zapret-discord-youtube/issues/417"
+    call :PrintRed "https://github.com/Flowseal/DPI-discord-youtube/issues/417"
 ) else (
     call :PrintGreen "Adguard check passed"
 )
@@ -439,8 +440,8 @@ echo:
 :: Killer
 sc query | findstr /I "Killer" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] Killer services found. Killer conflicts with zapret"
-    call :PrintRed "https://github.com/Flowseal/zapret-discord-youtube/issues/2512#issuecomment-2821119513"
+    call :PrintRed "[X] Killer services found. Killer conflicts with DPI"
+    call :PrintRed "https://github.com/Flowseal/DPI-discord-youtube/issues/2512#issuecomment-2821119513"
 ) else (
     call :PrintGreen "Killer check passed"
 )
@@ -449,7 +450,7 @@ echo:
 :: Intel Connectivity Network Service
 sc query | findstr /I "Intel" | findstr /I "Connectivity" | findstr /I "Network" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] Intel Connectivity Network Service found. It conflicts with zapret"
+    call :PrintRed "[X] Intel Connectivity Network Service found. It conflicts with DPI"
     call :PrintRed "https://github.com/ValdikSS/GoodbyeDPI/issues/541#issuecomment-2661670982"
 ) else (
     call :PrintGreen "Intel Connectivity check passed"
@@ -469,7 +470,7 @@ if !errorlevel!==0 (
 )
 
 if !checkpointFound!==1 (
-    call :PrintRed "[X] Check Point services found. Check Point conflicts with zapret"
+    call :PrintRed "[X] Check Point services found. Check Point conflicts with DPI"
     call :PrintRed "Try to uninstall Check Point"
 ) else (
     call :PrintGreen "Check Point check passed"
@@ -479,7 +480,7 @@ echo:
 :: SmartByte
 sc query | findstr /I "SmartByte" > nul
 if !errorlevel!==0 (
-    call :PrintRed "[X] SmartByte services found. SmartByte conflicts with zapret"
+    call :PrintRed "[X] SmartByte services found. SmartByte conflicts with DPI"
     call :PrintRed "Try to uninstall or disable SmartByte through services.msc"
 ) else (
     call :PrintGreen "SmartByte check passed"
@@ -489,7 +490,7 @@ echo:
 :: VPN
 sc query | findstr /I "VPN" > nul
 if !errorlevel!==0 (
-    call :PrintYellow "[?] Some VPN services found. Some VPNs can conflict with zapret"
+    call :PrintYellow "[?] Some VPN services found. Some VPNs can conflict with DPI"
     call :PrintYellow "Make sure that all VPNs are disabled"
 ) else (
     call :PrintGreen "VPN check passed"
@@ -567,7 +568,7 @@ if !winws_running! neq 0 if !windivert_running!==0 (
 )
 
 :: Conflicting bypasses
-set "conflicting_services=GoodbyeDPI discordfix_zapret winws1 winws2"
+set "conflicting_services=GoodbyeDPI discordfix_DPI winws1 winws2"
 set "found_any_conflict=0"
 set "found_conflicts="
 
@@ -648,7 +649,7 @@ if /i "!CHOICE!"=="Y" (
 )
 echo:
 
-pause
+timeout /t 2 >nul
 goto menu
 
 
@@ -675,14 +676,14 @@ cls
 if not exist "%gameFlagFile%" (
     echo Enabling game filter...
     echo ENABLED > "%gameFlagFile%"
-    call :PrintYellow "Restart the zapret to apply the changes"
+    call :PrintYellow "Restart the DPI to apply the changes"
 ) else (
     echo Disabling game filter...
     del /f /q "%gameFlagFile%"
-    call :PrintYellow "Restart the zapret to apply the changes"
+    call :PrintYellow "Restart the DPI to apply the changes"
 )
 
-pause
+timeout /t 3 >nul
 goto menu
 
 
@@ -742,13 +743,13 @@ if "%IPsetStatus%"=="loaded" (
         ren "%backupFile%" "ipset-all.txt"
     ) else (
         echo Error: no backup to restore. Update list from service menu first
-        pause
+        timeout /t 2 >nul
         goto menu
     )
     
 )
 
-pause
+timeout /t 3 >nul
 goto menu
 
 
@@ -758,7 +759,7 @@ chcp 437 > nul
 cls
 
 set "listFile=%~dp0lists\ipset-all.txt"
-set "url=https://raw.githubusercontent.com/Flowseal/zapret-discord-youtube/refs/heads/main/.service/ipset-service.txt"
+set "url=https://raw.githubusercontent.com/Flowseal/DPI-discord-youtube/refs/heads/main/.service/ipset-service.txt"
 
 echo Updating ipset-all...
 
@@ -776,10 +777,14 @@ if exist "%SystemRoot%\System32\curl.exe" (
 
 echo Finished
 
-pause
+timeout /t 2 >nul
 goto menu
 
 :: Utility functions
+
+:PrintWhite
+powershell -Command "Write-Host \"%~1\" -ForegroundColor White"
+exit /b
 
 :PrintGreen
 powershell -Command "Write-Host \"%~1\" -ForegroundColor Green"

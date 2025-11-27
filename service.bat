@@ -2,7 +2,7 @@
 
 chcp 65001 >nul
 
-set "version=0.2a"
+set "version=0.1a"
 set "elysium=[38;2;127;255;212mE[38;2;112;240;225ml[38;2;96;225;235my[38;2;80;210;240ms[38;2;64;195;245mi[38;2;48;180;250mu[38;2;32;165;255mm[0m"
 set "DS=[38;2;181;123;255mD[38;2;190;140;244mi[38;2;199;157;234ms[38;2;208;174;224mc[38;2;216;191;214mo[38;2;221;208;222mr[38;2;221;225;230md[0m"
 :: External commands
@@ -370,7 +370,7 @@ if /i "%CHOICE%"=="y" set "CHOICE=Y"
 
 if /i "%CHOICE%"=="Y" (
     echo Opening the download page...
-    start "" "%GITHUB_DOWNLOAD_URL%%GITHUB_VERSION%.rar"
+    start "" "%GITHUB_DOWNLOAD_URL%"
 )
 
 timeout /t 2 >nul
@@ -797,4 +797,3 @@ exit /b
 :PrintYellow
 powershell -Command "Write-Host \"%~1\" -ForegroundColor Yellow"
 exit /b
-

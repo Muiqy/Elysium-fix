@@ -1,3 +1,13 @@
+battlestategames.com
+www.battlestategames.com
+escapefromtarkov.com
+www.escapefromtarkov.com
+launcher.battlestategames.com
+backend.battlestategames.com
+prod.escapefromtarkov.com
+cdn.escapefromtarkov.com
+trading.escapefromtarkov.com
+ragfair.battlestategames.com
 chatgpt.com
 www.chatgpt.com
 chat.openai.com
